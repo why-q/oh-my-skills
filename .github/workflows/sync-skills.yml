@@ -1,0 +1,51 @@
+name: Sync Skills from Upstreams
+
+on:
+  schedule:
+    # Every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Configure Git
+        run: |
+          git config user.name "Skill Sync Bot"
+          git config user.email "bot@example.com"
+
+      - name: Run sync script
+        run: |
+          chmod +x scripts/sync-skills.sh
+          scripts/sync-skills.sh || echo "NO_CHANGES=true" >> $GITHUB_ENV
+
+      - name: Check for changes
+        if: env.NO_CHANGES != 'true'
+        id: check
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "### 🔄 Updated Skills:" >> $GITHUB_STEP_SUMMARY
+            git diff --stat >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Commit and push
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          git add -A
+          git commit -m "🔄 auto-sync: update skills from upstreams"
+          git push
+

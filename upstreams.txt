@@ -1,0 +1,10 @@
+# Add more upstreams below — one per line
+# Format: URL:BRANCH:LOCAL_PREFIX
+# Lines starting with # are ignored
+# https://github.com/openai/codex-skills.git:main:openai
+
+# ----------- #
+#  Upstreams  #
+# ----------- #
+
+https://github.com/JuliusBrussee/caveman.git:main:caveman
