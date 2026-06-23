@@ -8,3 +8,4 @@
 # ----------- #
 
 https://github.com/JuliusBrussee/caveman.git:main:caveman
+https://github.com/kepano/obsidian-skills.git:main:obsidian
