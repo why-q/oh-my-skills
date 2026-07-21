@@ -26,12 +26,21 @@ jobs:
           git config user.email "bot@example.com"
 
       - name: Run sync script
+        id: sync
         run: |
           chmod +x scripts/sync-skills.sh
-          scripts/sync-skills.sh || echo "NO_CHANGES=true" >> $GITHUB_ENV
+          set +e
+          scripts/sync-skills.sh
+          status=$?
+          set -e
+          case "$status" in
+            0) echo "changed=true" >> "$GITHUB_OUTPUT" ;;
+            1) echo "changed=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "Skills sync failed with status $status"; exit "$status" ;;
+          esac
 
       - name: Check for changes
-        if: env.NO_CHANGES != 'true'
+        if: steps.sync.outputs.changed == 'true'
         id: check
         run: |
           if git diff --quiet; then
@@ -48,4 +57,3 @@ jobs:
           git add -A
           git commit -m "🔄 auto-sync: update skills from upstreams"
           git push
-

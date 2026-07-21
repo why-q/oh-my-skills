@@ -37,13 +37,22 @@ fi
 
 chmod +x "$SYNC_SCRIPT"
 
-SYNC_CHANGES=0
-"$SYNC_SCRIPT" || SYNC_CHANGES=$?
+SYNC_STATUS=0
+"$SYNC_SCRIPT" || SYNC_STATUS=$?
 
-if [ "$SYNC_CHANGES" -eq 1 ]; then
-  echo ""
-  echo "No upstream changes detected"
-fi
+case "$SYNC_STATUS" in
+  0)
+    ;;
+  1)
+    echo ""
+    echo "No upstream changes detected"
+    ;;
+  *)
+    echo ""
+    echo "Error: Skills sync failed with status $SYNC_STATUS"
+    exit "$SYNC_STATUS"
+    ;;
+esac
 
 # ── Step 2: Check for changes ───────────────────────────────
 echo ""
