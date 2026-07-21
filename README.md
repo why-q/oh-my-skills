@@ -13,8 +13,8 @@ A curated, auto-synced collection of AI agent skills from multiple upstream GitH
 Edit `upstreams.txt`, then:
 
 ```bash
-./scripts/update.sh          # sync + commit + push
-./scripts/update.sh --ci     # also trigger GitHub Action
+./scripts/update-skills.sh          # sync + commit + push
+./scripts/update-skills.sh --ci     # also trigger GitHub Action
 ```
 
 ## upstreams.txt Format
@@ -37,3 +37,6 @@ Each upstream's skills land under `skills/<LOCAL_PREFIX>/`.
 ./scripts/sync-skills.sh
 git add -A && git commit -m "chore(skills): manual sync" && git push
 ```
+
+The sync script exits with status `0` when it updates skills, `1` when all
+skills are already current, and `2` when one or more upstreams fail.

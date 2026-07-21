@@ -212,12 +212,18 @@ test_workflow_does_not_mask_sync_failures() {
   assert_not_contains 'scripts/sync-skills.sh || echo' "$WORKFLOW"
 }
 
+test_readme_uses_existing_update_script() {
+  assert_contains './scripts/update-skills.sh' "$PROJECT_ROOT/README.md"
+  assert_not_contains './scripts/update.sh' "$PROJECT_ROOT/README.md"
+}
+
 test_changed_sync_returns_zero_and_deletes_stale_files
 test_unchanged_sync_returns_one
 test_clone_failure_returns_two
 test_missing_skills_directory_returns_two
 test_update_stops_before_staging_after_sync_failure
 test_workflow_does_not_mask_sync_failures
+test_readme_uses_existing_update_script
 cleanup
 TEST_ROOT=""
 
