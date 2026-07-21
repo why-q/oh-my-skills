@@ -15,6 +15,7 @@ UPSTREAMS_FILE="$REPO_ROOT/upstreams.txt"
 SKILLS_DIR="$REPO_ROOT/skills"
 TMP_DIR=$(mktemp -d)
 CHANGES=0
+FAILURES=0
 
 # ── Validate ────────────────────────────────────────────────
 if [ ! -f "$UPSTREAMS_FILE" ]; then
@@ -64,6 +65,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     --no-checkout \
     "$UPSTREAM_URL" "$CLONE_DIR" 2>/dev/null; then
     echo "  ❌ Failed to clone $UPSTREAM_URL — skipping"
+    FAILURES=1
     continue
   fi
 
@@ -75,6 +77,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
   # Verify the skills/ dir exists in upstream
   if [ ! -d "skills" ]; then
     echo "  ⚠️  No 'skills/' directory found in $REPO_NAME — skipping"
+    FAILURES=1
     cd - > /dev/null
     continue
   fi
@@ -110,7 +113,10 @@ done < <(grep -v '^\s*$' "$UPSTREAMS_FILE" | grep -v '^\s*#')
 rm -rf "$TMP_DIR"
 
 echo ""
-if [ "$CHANGES" -eq 1 ]; then
+if [ "$FAILURES" -eq 1 ]; then
+  echo "=== Sync incomplete: one or more upstreams failed ==="
+  exit 2
+elif [ "$CHANGES" -eq 1 ]; then
   echo "=== ✅ Changes detected — ready to commit ==="
   exit 0
 else
